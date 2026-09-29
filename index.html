@@ -93,13 +93,16 @@ function render() {
   pill.className = alive ? "alive" : "silent";
   ago.textContent = "last beat: " + fmtAgo(age);
   if (lastData) {
-    const p = lastData.proxies || {};
+    const p = lastData.lanes || lastData.proxies || {};
+    const wsl = p["wsl"] !== undefined ? p["wsl"] : p["8222"];
+    const mac = p["mac"] !== undefined ? p["mac"] : p["8223"];
+    const pc  = p["pc"]  !== undefined ? p["pc"]  : p["8224"];
     const dot = v => v === "up" ? '<span class="up">● up</span>' : '<span class="down">● down</span>';
     vitals.innerHTML =
       card("BEAT (CHICAGO)", new Date(lastBeat).toLocaleString("en-US", {timeZone: "America/Chicago"})) +
-      card("SSH 8222 · WSL", dot(p["8222"])) +
-      card("SSH 8223 · MAC", dot(p["8223"])) +
-      card("SSH 8224 · PC", dot(p["8224"])) +
+      card("SSH 8222 · WSL", dot(wsl)) +
+      card("TAILSCALE · MAC", dot(mac)) +
+      card("SSH 8224 · PC", dot(pc)) +
       card("VM UPTIME", lastData.uptime_human || "—") +
       card("BOOT", (lastData.boot_id || "—").slice(0, 8) + "…");
   }
