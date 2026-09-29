@@ -1,1 +1,1 @@
-{"beat": "2026-09-28T21:02:55-05:00", "unix": 1790647375, "boot_id": "e5ef237d-b749-4509-af0a-3eb986c3bbcb", "uptime_seconds": 1641, "uptime_human": "0d 0h 27m", "note": "Rook heartbeat", "proxies": {"8222": "up", "8223": "up", "8224": "up"}}
+{"beat": "2026-09-28T21:07:54-05:00", "unix": 1790647675, "boot_id": "e5ef237d-b749-4509-af0a-3eb986c3bbcb", "uptime_seconds": 1941, "uptime_human": "0d 0h 32m", "note": "Rook heartbeat", "proxies": {"8222": "up", "8223": "up", "8224": "up"}}
