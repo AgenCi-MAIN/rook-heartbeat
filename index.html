@@ -61,13 +61,21 @@
   <div id="pill" class="silent">···</div>
   <div id="err"></div>
   <div id="ago">waiting for first beat…</div>
+  <div id="vitals-status" role="status"></div>
   <div id="vitals"></div>
-  <footer>Bookmark this page. If it ever says <b style="color:#ff3b5c">SILENT</b>, Rook's machine is down — not your app.<br>Beats land every 5 minutes. Stale after 15.</footer>
+  <footer>Bookmark this page. <b style="color:#ff3b5c">STALE</b> means no recent beat was observed. <b>UNAVAILABLE</b> means heartbeat data could not be verified. Neither state proves the machine is down.<br>Beats land every 5 minutes. Stale after 15.</footer>
 
 <script>
 const API = "https://api.github.com/repos/AgenCi-MAIN/rook-heartbeat/contents/heartbeat.json";
 const STALE_MS = 15 * 60 * 1000;
-let lastBeat = null, lastData = null;
+let lastBeat = null, lastData = null, dataUnavailable = true;
+
+function parseBeat(value, now) {
+  if (typeof value !== "string" || !value.trim()) throw new Error("invalid beat timestamp");
+  const beat = Date.parse(value);
+  if (!Number.isFinite(beat) || beat > now) throw new Error("invalid or future beat timestamp");
+  return beat;
+}
 
 function fmtAgo(ms) {
   const s = Math.floor(ms / 1000);
@@ -82,14 +90,17 @@ function render() {
   const pill = document.getElementById("pill");
   const ago = document.getElementById("ago");
   const vitals = document.getElementById("vitals");
-  if (!lastBeat) {
-    pill.textContent = "SILENT"; pill.className = "silent";
-    ago.textContent = "no beat received yet";
+  const vitalsStatus = document.getElementById("vitals-status");
+  if (dataUnavailable || lastBeat === null) {
+    pill.textContent = "UNAVAILABLE"; pill.className = "silent";
+    ago.textContent = lastBeat === null ? "no verified beat received yet" : "last observed beat: " + fmtAgo(Math.max(0, Date.now() - lastBeat));
+    vitalsStatus.textContent = lastData ? "Historical vitals from the last observed beat — current data unavailable" : "No verified vitals available";
     return;
   }
   const age = Date.now() - lastBeat;
-  const alive = age < STALE_MS;
-  pill.textContent = alive ? "ALIVE" : "SILENT";
+  const alive = age >= 0 && age < STALE_MS;
+  vitalsStatus.textContent = alive ? "Vitals from the last observed beat" : "Historical vitals — the last observed beat is stale";
+  pill.textContent = alive ? "ALIVE" : "STALE";
   pill.className = alive ? "alive" : "silent";
   ago.textContent = "last beat: " + fmtAgo(age);
   if (lastData) {
@@ -117,12 +128,13 @@ async function poll() {
     if (!r.ok) throw new Error("http " + r.status);
     const j = await r.json();
     const data = JSON.parse(atob(j.content.replace(/\n/g, "")));
-    lastBeat = new Date(data.beat).getTime();
+    lastBeat = parseBeat(data.beat, Date.now());
+    dataUnavailable = false;
     lastData = data;
     document.getElementById("err").textContent = "";
   } catch (e) {
     document.getElementById("err").textContent = "can't reach heartbeat data (" + e.message + ")";
-    lastBeat = null;
+    dataUnavailable = true;
   }
   render();
 }
