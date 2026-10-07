@@ -1,1 +1,1 @@
-{"beat": "2026-10-07T10:17:32-05:00", "unix": 1791386252, "boot_id": "52462eb4-78df-4204-879a-9c22ccf5a099", "uptime_seconds": 2907, "uptime_human": "0d 0h 48m", "note": "Rook heartbeat", "lanes": {"wsl": "up", "mac": "up", "pc": "up"}}
+{"beat": "2026-10-07T10:20:59-05:00", "unix": 1791386459, "boot_id": "52462eb4-78df-4204-879a-9c22ccf5a099", "uptime_seconds": 3114, "uptime_human": "0d 0h 51m", "note": "Rook heartbeat", "lanes": {"wsl": "up", "mac": "up", "pc": "up"}}
